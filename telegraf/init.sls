@@ -1,5 +1,6 @@
 {% from "telegraf/map.jinja" import telegraf with context %}
 
+{% if not grains['os'] == 'FreeBSD' %}
 influxdata_repo:
   pkgrepo.managed:
     - humanname: Influxdata repo
@@ -8,6 +9,7 @@ influxdata_repo:
     - file: /etc/apt/sources.list.d/influxdata.list
     - require_in:
       - pkg: telegraf
+{% endif %}
 
 telegraf_pkg:
   pkg.installed:
@@ -15,7 +17,11 @@ telegraf_pkg:
 
 telegraf_conf:
   file.managed:
+    {% if grains['os'] == 'FreeBSD' %}
+    - name: /usr/local/etc/telegraf.conf
+    {% else %}
     - name: /etc/telegraf/telegraf.conf
+    {% endif %}
     - source: salt://telegraf/templates/telegraf.conf
     - template: jinja
 

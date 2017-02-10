@@ -3,7 +3,9 @@
 
 {% set oscodename = salt['grains.filter_by'](oscodename_map, grain='oscodename') %}
 
-{% do defaults.telegraf.update(oscodename) %}
+{% if not grains['os'] == 'FreeBSD' %}
+       {% do defaults.telegraf.update(oscodename) %}
+{% endif %}
 
 {# Read the interfaces that have an ip assigned and add that to defaults #}
 {% set interfaces = salt.grains.get('ip4_interfaces') %}
